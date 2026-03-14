@@ -460,17 +460,13 @@ export const sectionByPath: Record<string, string> = {
   ),
 }
 
-// Page number by route (01, 02, etc. — restarts per section)
+// Page number by route (01, 02, etc. — restarts per section; accordion is 01)
 export const pageNumberByPath: Record<string, string> = (() => {
   const result: Record<string, string> = { "/system": "01" }
   for (const section of navigation) {
-    const items =
-      section.title === "Components"
-        ? [{ href: "/components", title: "Components" }, ...section.items]
-        : section.items
-    items.forEach((item, index) => {
+    for (const [index, item] of section.items.entries()) {
       result[item.href] = String(index + 1).padStart(2, "0")
-    })
+    }
   }
   return result
 })()

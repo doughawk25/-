@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarProvider, SidebarInset, SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import {
   Breadcrumb,
@@ -18,6 +18,34 @@ import { useTheme } from "next-themes"
 import { DocsSidebar } from "@/components/docs/sidebar-nav"
 import { Logo } from "@/components/docs/logo"
 import { SystemAuthProvider } from "@/components/docs/system-auth-provider"
+
+function SidebarOpenOnSystemNav() {
+  const pathname = usePathname()
+  const prevPathnameRef = React.useRef<string | null>(null)
+  const { setOpen, setOpenMobile, isMobile } = useSidebar()
+
+  React.useEffect(() => {
+    const prev = prevPathnameRef.current
+    prevPathnameRef.current = pathname
+
+    const isDesignSystemPage =
+      pathname === "/system" ||
+      pathname.startsWith("/foundation") ||
+      pathname.startsWith("/tokens") ||
+      pathname.startsWith("/components") ||
+      pathname === "/motion"
+
+    if (prev === "/" && isDesignSystemPage) {
+      if (isMobile) {
+        setOpenMobile(true)
+      } else {
+        setOpen(true)
+      }
+    }
+  }, [pathname, isMobile, setOpen, setOpenMobile])
+
+  return null
+}
 
 function formatSegment(segment: string): string {
   return segment
@@ -98,6 +126,7 @@ export default function DocsLayout({
     <SystemAuthProvider pathname={pathname}>
     <TooltipProvider>
       <SidebarProvider className="h-dvh overflow-hidden">
+        <SidebarOpenOnSystemNav />
         {isDesignSystemPage && <DocsSidebar />}
         <SidebarInset
           className={isDesignSystemPage ? "min-h-dvh" : "min-h-0"}
