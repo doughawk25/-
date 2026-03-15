@@ -2,7 +2,7 @@
 
 import { useDrawingContext } from '@/context/drawing-context'
 import { Toggle } from '@/components/ui/toggle'
-import { Pen, Mouse } from 'lucide-react'
+import { Pen, Pointer } from 'lucide-react'
 
 export function DrawingToolToggle() {
   const { mode, setMode } = useDrawingContext()
@@ -22,7 +22,7 @@ export function DrawingToolToggle() {
       {mode === 'pen' ? (
         <Pen className="h-4 w-4" />
       ) : (
-        <Mouse className="h-4 w-4" />
+        <Pointer className="h-4 w-4" />
       )}
     </Toggle>
   )

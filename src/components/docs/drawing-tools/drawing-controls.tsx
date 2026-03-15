@@ -51,10 +51,10 @@ export function DrawingControls() {
               <button
                 key={color.value}
                 onClick={() => setBrushColor(color.value)}
-                className={`h-10 w-10 rounded border-2 transition-all ${
+                className={`h-10 w-10 rounded border-2 transition-all cursor-pointer ${
                   brushColor === color.value
-                    ? 'border-ring ring-2 ring-ring/50'
-                    : 'border-border hover:border-ring'
+                    ? 'border-ring ring-2 ring-ring/50 shadow-lg scale-110'
+                    : 'border-border hover:border-ring hover:scale-105'
                 }`}
                 style={{ backgroundColor: color.value }}
                 title={color.name}
