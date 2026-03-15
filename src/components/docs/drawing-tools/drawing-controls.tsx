@@ -28,7 +28,7 @@ export function DrawingControls() {
   if (mode !== 'pen') return null
 
   return (
-    <div className="absolute left-4 top-14 z-40 w-72 rounded-lg border border-border bg-popover p-4 shadow-md">
+    <div className="absolute left-4 top-14 z-50 w-72 rounded-lg border border-border bg-popover p-4 shadow-md pointer-events-auto">
       <div className="space-y-4">
         {/* Brush Size */}
         <div className="space-y-2">

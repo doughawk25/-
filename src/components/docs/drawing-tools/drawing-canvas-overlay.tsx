@@ -12,7 +12,7 @@ export function DrawingCanvasOverlay() {
     <canvas
       ref={canvasRef}
       className={cn(
-        'fixed inset-0 z-50 bg-transparent',
+        'fixed inset-0 z-30',
         mode === 'pen' ? 'pointer-events-auto cursor-crosshair' : 'pointer-events-none'
       )}
       style={{

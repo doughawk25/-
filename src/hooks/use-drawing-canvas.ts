@@ -12,6 +12,7 @@ export function useDrawingCanvas(mode: 'cursor' | 'pen') {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
   const isDrawingRef = useRef(false)
   const currentPathRef = useRef<[x: number, y: number][]>([])
+  const dprRef = useRef(1)
 
   const [brushSize, setBrushSize] = useState(3)
   const [brushColor, setBrushColor] = useState('#000000')
@@ -23,7 +24,7 @@ export function useDrawingCanvas(mode: 'cursor' | 'pen') {
     if (!canvas) return
 
     const dpr = window.devicePixelRatio || 1
-    const rect = canvas.getBoundingClientRect()
+    dprRef.current = dpr
 
     // Set canvas size
     canvas.width = window.innerWidth * dpr
@@ -56,6 +57,7 @@ export function useDrawingCanvas(mode: 'cursor' | 'pen') {
     // Handle window resize
     const handleResize = () => {
       const newDpr = window.devicePixelRatio || 1
+      dprRef.current = newDpr
       canvas.width = window.innerWidth * newDpr
       canvas.height = window.innerHeight * newDpr
 
