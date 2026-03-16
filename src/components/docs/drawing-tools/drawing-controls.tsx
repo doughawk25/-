@@ -1,6 +1,6 @@
 'use client'
 
-import { useDrawingContext } from '@/context/drawing-context'
+import { useDrawingContext, type ToolType, type FillMode } from '@/context/drawing-context'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { RotateCcw, RotateCw } from 'lucide-react'
@@ -49,27 +49,16 @@ export function DrawingControls() {
 
   if (mode !== 'pen' || !menuOpen) return null
 
-  return (
-    <div className="fixed left-4 top-14 z-50 w-72 rounded-lg border border-foreground/10 bg-background/90 backdrop-blur-md p-4 shadow-lg pointer-events-auto dark:bg-background/80 dark:border-foreground/15">
-      <div className="space-y-4">
-        {/* Brush Size */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Brush Size: {brushSize}px</label>
-          <Slider
-            value={[brushSize]}
-            onValueChange={(val) => setBrushSize(Array.isArray(val) ? val[0] : val)}
-            min={1}
-            max={50}
-            step={1}
-            className="w-full"
-          />
-        </div>
+  const showBrushSize = activeTool === 'brush' || activeTool === 'eraser'
+  const showFillMode = activeTool === 'triangle' || activeTool === 'rectangle' || activeTool === 'ellipse'
 
-        {/* Color Picker */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Color</label>
-          <div className="relative" ref={pickerRef}>
-            {/* Color trigger button */}
+  return (
+    <div className="rounded-lg border border-foreground/10 bg-background/90 backdrop-blur-md shadow-lg dark:bg-background/80 dark:border-foreground/15">
+      <div className="p-2 space-y-2">
+        {/* ---- Main row: tools + swatch + undo/redo ---- */}
+        <div className="flex items-center gap-1">
+          {/* Tool buttons */}
+          {TOOLS.map(({ id, icon: Icon, label }) => (
             <button
               onClick={() => setColorPickerOpen(!colorPickerOpen)}
               className="flex w-full items-center gap-2 rounded border border-foreground/10 bg-foreground/5 px-2 py-1.5 text-sm text-foreground hover:bg-foreground/10 transition-colors cursor-pointer"
@@ -80,6 +69,7 @@ export function DrawingControls() {
               />
               <span className="flex-1 text-left capitalize">{currentColorLabel}</span>
             </button>
+          ))}
 
             {/* Color picker dropdown */}
             {colorPickerOpen && (
@@ -108,32 +98,117 @@ export function DrawingControls() {
                 </div>
               </div>
             )}
-          </div>
+            style={{ backgroundColor: brushColor }}
+            aria-label="Toggle color palette"
+            aria-expanded={paletteOpen}
+          />
+
+          {/* Divider */}
+          <div className="h-5 w-px bg-foreground/10 mx-0.5" />
+
+          {/* Undo / Redo with Tooltips */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={undo}
+                    disabled={!canUndo}
+                  />
+                }
+              >
+                <RotateCcw className="size-4" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Undo</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={redo}
+                    disabled={!canRedo}
+                  />
+                }
+              >
+                <RotateCw className="size-4" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Redo</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
-        {/* Undo / Redo */}
-        <div className="flex gap-2">
-          <Button
-            onClick={undo}
-            disabled={!canUndo}
-            variant="secondary"
-            size="sm"
-            className="flex-1"
-          >
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-            Undo
-          </Button>
-          <Button
-            onClick={redo}
-            disabled={!canRedo}
-            variant="secondary"
-            size="sm"
-            className="flex-1"
-          >
-            <RotateCw className="mr-1.5 h-3.5 w-3.5" />
-            Redo
-          </Button>
-        </div>
+        {/* ---- Expandable color palette ---- */}
+        {paletteOpen && (
+          <>
+            <div className="h-px bg-foreground/10" />
+            <div className="grid grid-cols-14 gap-0.5">
+              {PALETTE_COLORS.map(({ hex, label }) => (
+                <button
+                  key={hex}
+                  onClick={() => setBrushColor(hex)}
+                  title={label}
+                  className={cn(
+                    'h-4 w-4 rounded-[2px] border transition-all cursor-pointer',
+                    brushColor === hex
+                      ? 'border-foreground ring-1 ring-foreground/30 scale-110'
+                      : 'border-foreground/15 hover:border-foreground/40'
+                  )}
+                  style={{ backgroundColor: hex }}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ---- Contextual tool options ---- */}
+        {(showBrushSize || showFillMode) && (
+          <>
+            <div className="h-px bg-foreground/10" />
+            <div className="space-y-2">
+              {showBrushSize && (
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground/70">
+                    {activeTool === 'eraser' ? 'Eraser' : 'Brush'} Size: {brushSize}px
+                  </label>
+                  <Slider
+                    value={[brushSize]}
+                    onValueChange={(val) => setBrushSize(Array.isArray(val) ? val[0] : val)}
+                    min={1}
+                    max={50}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
+              )}
+
+              {showFillMode && (
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground/70">Fill</label>
+                  <div className="flex gap-1">
+                    {(['outline', 'filled', 'both'] as FillMode[]).map((fm) => (
+                      <button
+                        key={fm}
+                        onClick={() => setFillMode(fm)}
+                        className={cn(
+                          'flex-1 rounded-[var(--radius-component-sm)] px-2 py-1 text-xs capitalize transition-colors cursor-pointer',
+                          fillMode === fm
+                            ? 'bg-foreground/10 text-foreground font-medium'
+                            : 'text-foreground/60 hover:bg-foreground/5'
+                        )}
+                      >
+                        {fm}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
