@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useSystemAuth } from "@/components/docs/system-auth-provider"
+import { transitions } from "@/lib/motion"
 
 const items = [
   { label: "About", href: "/about", locked: true },
@@ -13,6 +14,22 @@ const items = [
   { label: "Archive", href: "/archive", locked: true },
   { label: "System", href: "/system", locked: false },
 ] as const
+
+const container = {
+  initial: {},
+  animate: {
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+  },
+  exit: {
+    transition: { staggerChildren: 0.04, staggerDirection: -1 },
+  },
+}
+
+const navItem = {
+  initial: { x: 12, opacity: 0 },
+  animate: { x: 0, opacity: 1, transition: transitions.normal },
+  exit: { x: 12, opacity: 0, transition: transitions.fast },
+}
 
 export function HomeNav() {
   const pathname = usePathname()
@@ -23,6 +40,10 @@ export function HomeNav() {
     <nav
       className="flex w-48 flex-col gap-1"
       onMouseLeave={() => setHoveredIndex(null)}
+      variants={container}
+      initial="initial"
+      animate="animate"
+      exit="exit"
     >
       {items.map((item, i) => (
         <Link
