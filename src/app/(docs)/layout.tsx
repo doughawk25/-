@@ -191,7 +191,17 @@ export default function DocsLayout({
 
             {/* Mobile: stacked rows */}
             <div className="flex flex-col gap-2 md:hidden">
-              {/* Row 1: time + theme + year */}
+              {/* Row 1: links */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <a href="https://www.instagram.com/_d0u9/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Instagram</a>
+                <a href="https://www.linkedin.com/in/doughawk25/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">LinkedIn</a>
+                <a href="https://github.com/doughawk25" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">GitHub</a>
+                <a href="https://www.youtube.com/playlist?list=PLeRINMiW66O7u5E6y8MXTRd9VFbxGI7Jo" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">YouTube</a>
+                <span className="opacity-50">·</span>
+                <a href="/doom" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Doom</a>
+                <a href="/gallery" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Gallery</a>
+              </div>
+              {/* Row 2: time + theme + year */}
               <div className="flex items-center justify-between">
                 <span className="text-primary font-medium">{localTime}</span>
                 <div className="flex items-center gap-1">
@@ -212,16 +222,6 @@ export default function DocsLayout({
                   <span className="opacity-50 ml-1">·</span>
                   <span className="ml-1">© {new Date().getFullYear()}</span>
                 </div>
-              </div>
-              {/* Row 2: links */}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <a href="https://www.instagram.com/_d0u9/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Instagram</a>
-                <a href="https://www.linkedin.com/in/doughawk25/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">LinkedIn</a>
-                <a href="https://github.com/doughawk25" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">GitHub</a>
-                <a href="https://www.youtube.com/playlist?list=PLeRINMiW66O7u5E6y8MXTRd9VFbxGI7Jo" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">YouTube</a>
-                <span className="opacity-50">·</span>
-                <a href="/doom" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Doom</a>
-                <a href="/gallery" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Gallery</a>
               </div>
             </div>
           </footer>

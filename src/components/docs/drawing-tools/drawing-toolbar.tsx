@@ -249,6 +249,34 @@ export function DrawingToolbar() {
           </Button>
         )}
 
+        {/* Save + Trash — next to mode switcher */}
+        {canUndo && (
+          <Button
+            onClick={handleSave}
+            variant="secondary"
+            size="icon"
+            aria-label="Save to gallery"
+          >
+            <Save className="h-3.5 w-3.5" />
+          </Button>
+        )}
+        {canUndo && (
+          <Button
+            ref={trashRef}
+            onClick={handleTrashClick}
+            variant="destructive"
+            size={confirmOpen ? 'default' : 'icon'}
+            aria-label={confirmOpen ? 'Confirm clear canvas' : 'Clear canvas'}
+            className={cn(
+              'transition-all duration-200 ease-in-out',
+              confirmOpen && 'min-w-[5rem] gap-1.5'
+            )}
+          >
+            <Trash2 className="h-3.5 w-3.5 shrink-0" />
+            {confirmOpen && <span className="text-sm">Clear</span>}
+          </Button>
+        )}
+
         <AnimatePresence>
           {/* Tool Menu — slides right of +/X button */}
           {mode === 'pen' && menuOpen && (
@@ -445,37 +473,6 @@ export function DrawingToolbar() {
           </motion.div>
           )}
 
-          {/* Save + Trash buttons outside menu */}
-          {canUndo && (
-            <motion.div key="save" layout transition={transitions.fast} {...slideFromLeft}>
-              <Button
-                onClick={handleSave}
-                variant="secondary"
-                size="icon"
-                aria-label="Save to gallery"
-              >
-                <Save className="h-3.5 w-3.5" />
-              </Button>
-            </motion.div>
-          )}
-          {canUndo && (
-            <motion.div key="trash" layout transition={transitions.fast} {...slideFromLeft}>
-              <Button
-                ref={trashRef}
-                onClick={handleTrashClick}
-                variant="destructive"
-                size={confirmOpen ? 'default' : 'icon'}
-                aria-label={confirmOpen ? 'Confirm clear canvas' : 'Clear canvas'}
-                className={cn(
-                  'transition-all duration-200 ease-in-out',
-                  confirmOpen && 'min-w-[5rem] gap-1.5'
-                )}
-              >
-                <Trash2 className="h-3.5 w-3.5 shrink-0" />
-                {confirmOpen && <span className="text-sm">Clear</span>}
-              </Button>
-            </motion.div>
-          )}
         </AnimatePresence>
       </div>
     </TooltipProvider>
