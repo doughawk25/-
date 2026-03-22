@@ -17,8 +17,8 @@ import { Label } from "@/components/ui/label"
 const STORAGE_KEY = "monad-system-auth"
 const PASSWORD =
   typeof process !== "undefined"
-    ? process.env.NEXT_PUBLIC_SYSTEM_PASSWORD ?? "1234"
-    : "1234"
+    ? process.env.NEXT_PUBLIC_SYSTEM_PASSWORD ?? "4255"
+    : "4255"
 
 function getStoredAuth(): boolean {
   if (typeof window === "undefined") return false
@@ -37,7 +37,7 @@ function setStoredAuth() {
   }
 }
 
-const LOCKED_PATHS = ["/about", "/contact", "/work", "/archive"]
+const LOCKED_PATHS = ["/about", "/contact", "/work", "/archive", "/system"]
 
 const SystemAuthContext = React.createContext<{
   isAuthenticated: boolean
@@ -118,9 +118,9 @@ export function SystemAuthProvider({
         <DialogContent showCloseButton={false}>
           <form onSubmit={handleSubmit}>
             <DialogHeader>
-              <DialogTitle>Enter PIN</DialogTitle>
+              <DialogTitle>You shall not pass, robots still working.</DialogTitle>
               <DialogDescription>
-                This page is protected. Enter the PIN to continue.
+                Unless you know the secret code.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
