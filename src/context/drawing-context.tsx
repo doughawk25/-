@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react'
 import type p5 from 'p5'
+import { saveToGallery, type GalleryEntry } from '@/lib/gallery-storage'
 
 export type ToolType = 'brush' | 'eraser' | 'line' | 'rectangle' | 'ellipse' | 'triangle'
 export type FillMode = 'outline' | 'filled'
@@ -15,8 +16,8 @@ export type DrawAction =
   | { type: 'triangle'; start: [number, number]; end: [number, number]; color: string; size: number; fillMode: FillMode }
 
 interface DrawingContextType {
-  mode: 'cursor' | 'pen' | 'doom'
-  setMode: (mode: 'cursor' | 'pen' | 'doom') => void
+  mode: 'cursor' | 'pen'
+  setMode: (mode: 'cursor' | 'pen') => void
   menuOpen: boolean
   setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>
   activeTool: ToolType
@@ -35,9 +36,8 @@ interface DrawingContextType {
   canUndo: boolean
   canRedo: boolean
   clearRedoStack: () => void
+  saveCanvas: () => Promise<GalleryEntry | null>
   p5Ref: React.MutableRefObject<p5 | null>
-  doomFullscreen: boolean
-  setDoomFullscreen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const DrawingContext = createContext<DrawingContextType | undefined>(undefined)
@@ -45,7 +45,7 @@ const DrawingContext = createContext<DrawingContextType | undefined>(undefined)
 const HISTORY_CAP = 100
 
 export function DrawingProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState<'cursor' | 'pen' | 'doom'>('cursor')
+  const [mode, setMode] = useState<'cursor' | 'pen'>('cursor')
   const [menuOpen, setMenuOpen] = useState(true)
   const [activeTool, setActiveTool] = useState<ToolType>('brush')
   const [fillMode, setFillMode] = useState<FillMode>('outline')
@@ -63,7 +63,6 @@ export function DrawingProvider({ children }: { children: React.ReactNode }) {
     return []
   })
   const [redoStack, setRedoStack] = useState<DrawAction[]>([])
-  const [doomFullscreen, setDoomFullscreen] = useState(false)
   const p5Ref = useRef<p5 | null>(null)
 
   const saveToSession = useCallback((newHistory: DrawAction[]) => {
@@ -106,6 +105,23 @@ export function DrawingProvider({ children }: { children: React.ReactNode }) {
     })
   }, [saveToSession])
 
+  const saveCanvas = useCallback(async (): Promise<GalleryEntry | null> => {
+    try {
+      const html2canvas = (await import('html2canvas')).default
+      const target = document.querySelector('main') || document.body
+      const canvas = await html2canvas(target, {
+        useCORS: true,
+        scale: 1,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      })
+      const dataUrl = canvas.toDataURL('image/png')
+      return saveToGallery(dataUrl, canvas.width, canvas.height)
+    } catch {
+      return null
+    }
+  }, [])
+
   return (
     <DrawingContext.Provider
       value={{
@@ -129,9 +145,8 @@ export function DrawingProvider({ children }: { children: React.ReactNode }) {
         canUndo: history.length > 0,
         canRedo: redoStack.length > 0,
         clearRedoStack: useCallback(() => setRedoStack([]), []),
+        saveCanvas,
         p5Ref,
-        doomFullscreen,
-        setDoomFullscreen,
       }}
     >
       {children}

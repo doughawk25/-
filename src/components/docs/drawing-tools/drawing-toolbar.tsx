@@ -8,8 +8,6 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/comp
 import {
   Menu,
   Pen,
-  Crosshair,
-  ExternalLink,
   Paintbrush,
   Eraser,
   Minus,
@@ -22,10 +20,10 @@ import {
   Plus,
   SquareDashed,
   SquareIcon,
-  Info,
+  Save,
 } from 'lucide-react'
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { transitions } from '@/lib/motion'
@@ -152,6 +150,7 @@ export function DrawingToolbar() {
     canUndo,
     canRedo,
     clearCanvas,
+    saveCanvas,
   } = useDrawingContext()
 
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -195,6 +194,15 @@ export function DrawingToolbar() {
     }
   }
 
+  const handleSave = useCallback(async () => {
+    const entry = await saveCanvas()
+    if (entry) {
+      toast.success('Saved to gallery')
+    } else {
+      toast.error('Nothing to save')
+    }
+  }, [saveCanvas])
+
   const handleToolChange = (values: string[]) => {
     if (values.length > 0) {
       setActiveTool(values[0] as ToolType)
@@ -211,7 +219,7 @@ export function DrawingToolbar() {
     <TooltipProvider>
       <div className="fixed left-4 top-0 z-40 flex h-14 items-center gap-1 pointer-events-auto">
         {/* Mode Toggle — always separate */}
-        <Tabs value={mode} onValueChange={(v) => setMode(v as 'cursor' | 'pen' | 'doom')}>
+        <Tabs value={mode} onValueChange={(v) => setMode(v as 'cursor' | 'pen')}>
           <TabsList>
             <TabsTrigger value="cursor" aria-label="Cursor mode">
               <Menu className="size-4" />
@@ -219,80 +227,24 @@ export function DrawingToolbar() {
             <TabsTrigger value="pen" aria-label="Drawing mode">
               <Pen className="size-4" />
             </TabsTrigger>
-            <TabsTrigger value="doom" aria-label="Doom mode">
-              <Crosshair className="size-4" />
-            </TabsTrigger>
           </TabsList>
         </Tabs>
 
-        {/* +/X toggle — pen mode: toggle tool menu, doom mode: close game */}
-        {(mode === 'pen' || mode === 'doom') && (
+        {/* +/X toggle — pen mode only */}
+        {mode === 'pen' && (
           <Button
             variant="secondary"
             size="icon"
-            onClick={mode === 'doom' ? () => setMode('cursor') : () => setMenuOpen((v) => !v)}
-            aria-label={mode === 'doom' ? 'Close Doom' : menuOpen ? 'Close tool menu' : 'Open tool menu'}
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? 'Close tool menu' : 'Open tool menu'}
           >
             <Plus
               className={cn(
                 'h-4 w-4 transition-transform duration-200',
-                (mode === 'doom' || menuOpen) && 'rotate-45'
+                menuOpen && 'rotate-45'
               )}
             />
           </Button>
-        )}
-
-        {/* Doom: open in new tab */}
-        {mode === 'doom' && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => window.open('https://silentspacemarine.com', '_blank')}
-            aria-label="Open Doom in new tab"
-          >
-            <ExternalLink className="size-4" />
-          </Button>
-        )}
-
-        {/* Doom controls info */}
-        {mode === 'doom' && (
-          <Popover>
-            <PopoverTrigger
-              render={
-                <Button variant="ghost" size="icon" aria-label="Controls info" />
-              }
-            >
-              <Info className="size-4" />
-            </PopoverTrigger>
-            <PopoverContent side="bottom" align="start" className="w-72 text-xs space-y-3">
-              <p className="font-medium text-foreground text-sm">Controls</p>
-              <div className="space-y-2">
-                <p className="font-medium text-foreground/80 text-[11px] uppercase tracking-wider">Keyboard</p>
-                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-foreground/70">
-                  <kbd className="font-mono text-foreground/90">↑ ↓</kbd><span>Move forward / back</span>
-                  <kbd className="font-mono text-foreground/90">← →</kbd><span>Turn left / right</span>
-                  <kbd className="font-mono text-foreground/90">Ctrl</kbd><span>Fire</span>
-                  <kbd className="font-mono text-foreground/90">Space</kbd><span>Use / Open door</span>
-                  <kbd className="font-mono text-foreground/90">Shift</kbd><span>Run</span>
-                  <kbd className="font-mono text-foreground/90">Alt + ← →</kbd><span>Strafe</span>
-                  <kbd className="font-mono text-foreground/90">, / .</kbd><span>Strafe left / right</span>
-                  <kbd className="font-mono text-foreground/90">1-7</kbd><span>Select weapon</span>
-                  <kbd className="font-mono text-foreground/90">Tab</kbd><span>Automap</span>
-                  <kbd className="font-mono text-foreground/90">Pause</kbd><span>Pause</span>
-                  <kbd className="font-mono text-foreground/90">Esc</kbd><span>Menu</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="font-medium text-foreground/80 text-[11px] uppercase tracking-wider">Mouse</p>
-                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-foreground/70">
-                  <kbd className="font-mono text-foreground/90">Move</kbd><span>Move / Turn</span>
-                  <kbd className="font-mono text-foreground/90">Left Click</kbd><span>Fire</span>
-                  <kbd className="font-mono text-foreground/90">Right Click</kbd><span>Move forward</span>
-                  <kbd className="font-mono text-foreground/90">Middle Click</kbd><span>Strafe</span>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
         )}
 
         <AnimatePresence>
@@ -477,7 +429,19 @@ export function DrawingToolbar() {
           </motion.div>
           )}
 
-          {/* Trash button outside menu */}
+          {/* Save + Trash buttons outside menu */}
+          {canUndo && (
+            <motion.div key="save" layout transition={transitions.fast} {...slideFromLeft}>
+              <Button
+                onClick={handleSave}
+                variant="secondary"
+                size="icon"
+                aria-label="Save to gallery"
+              >
+                <Save className="h-3.5 w-3.5" />
+              </Button>
+            </motion.div>
+          )}
           {canUndo && (
             <motion.div key="trash" layout transition={transitions.fast} {...slideFromLeft}>
               <Button

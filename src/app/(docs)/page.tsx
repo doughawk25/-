@@ -2,7 +2,7 @@
 
 import { HomeNav } from "@/components/docs/home-nav"
 import { DrawingProvider, useDrawingContext } from "@/context/drawing-context"
-import { DrawingToolbar, DrawingCanvasOverlay, DoomPanel } from "@/components/docs/drawing-tools"
+import { DrawingToolbar, DrawingCanvasOverlay } from "@/components/docs/drawing-tools"
 import { AnimatePresence } from "framer-motion"
 
 function HomeContent() {
@@ -12,7 +12,7 @@ function HomeContent() {
     <main className="flex min-h-full w-full flex-col justify-center bg-background">
       <div className="relative w-full h-full flex items-center justify-end">
         <AnimatePresence>
-          {mode === 'cursor' && (
+          {mode !== 'pen' && (
             <div className="relative z-40 pointer-events-auto">
               <HomeNav />
             </div>
@@ -21,9 +21,6 @@ function HomeContent() {
         <DrawingToolbar />
       </div>
       <DrawingCanvasOverlay />
-      <AnimatePresence>
-        <DoomPanel />
-      </AnimatePresence>
     </main>
   )
 }

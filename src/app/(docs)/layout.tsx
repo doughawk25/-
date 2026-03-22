@@ -144,6 +144,8 @@ export default function DocsLayout({
               className={
                 pathname === "/"
                   ? "flex min-h-full w-full max-w-none flex-col items-center justify-center px-4 py-8"
+                  : pathname === "/gallery"
+                  ? "w-full px-6 py-8"
                   : "mx-auto max-w-4xl px-6 py-8"
               }
             >
@@ -158,6 +160,9 @@ export default function DocsLayout({
               <a href="https://www.linkedin.com/in/doughawk25/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">LinkedIn</a>
               <a href="https://github.com/doughawk25" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">GitHub</a>
               <a href="https://www.youtube.com/playlist?list=PLeRINMiW66O7u5E6y8MXTRd9VFbxGI7Jo" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">YouTube</a>
+              <span className="opacity-50">·</span>
+              <a href="/doom" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Doom</a>
+              <a href="/gallery" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Gallery</a>
             </div>
             <div className="flex items-center gap-4">
               {mounted && (
